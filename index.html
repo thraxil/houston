@@ -1,0 +1,105 @@
+<html>
+<head>
+<title>Houston</title>
+
+<style type="text/css">
+body {background-color: #eee;}
+
+</style>
+
+</head>
+<body>
+	<h1>Houston</h1>
+
+	<table>
+		<thead>
+			<tr>
+				<th>Server</th>
+				<th>CPU</th>
+				<th>Memory</th>
+				<th>Disk</th>
+				<th>Network</th>
+		</thead>
+
+<tbody>
+{{ range .Servers }}
+<tr>
+	<td>{{.Name}}</td>
+	<td>
+		<img src="{{.CPUGraphUrl}}" />
+	</td>
+
+	<td>
+		<img src="{{.MemGraphUrl}}" />
+	</td>
+
+	<td>
+		<img src="{{.DiskUsageGraphUrl}}" />
+	</td>
+
+	<td>
+		<img src="{{.NetworkGraphUrl}}" />
+	</td>
+</tr>
+<tr>
+	<td></td>
+	<td><img src="{{.CPUGraphUrlWeekly}}" /></td>
+	<td><img src="{{.MemGraphUrlWeekly}}" /></td>
+	<td><img src="{{.DiskUsageGraphUrlWeekly}}" /></td>
+	<td><img src="{{.NetworkGraphUrlWeekly}}" /></td>
+</tr>
+{{ end }}
+</tbody>
+	</table>
+
+<table>
+	<tr>
+		<td>Nginx</td>
+		<td><img src="{{.NginxGraph.NginxGraphUrl}}" /></td>
+	</tr>
+
+	<tr>
+		<td></td>
+		<td><img src="{{.NginxGraph.NginxGraphUrlWeekly}}" /></td>
+	</tr>
+
+	<tr>
+		<td>RabbitMQ</td>
+		<td><img src="{{.RabbitMQGraph.RabbitMQGraphUrl}}" /></td>
+	</tr>
+	<tr>
+		<td>Riak</td>
+		<td><img src="{{.RiakGraph.RiakGraphUrl}}" /></td>
+	</tr>
+</table>
+
+<table>
+	<thead>
+		<tr>
+			<th>app</th>
+			<th>REQs/s</th>
+			<th>500s</th>
+			<th>Time</th>
+		</tr>
+	</thead>
+
+<tbody>
+{{ range .Applications }}
+<tr>
+	<td>{{.Name}}</td>
+	<td><img src="{{.ReqsGraphUrl}}" /></td>
+	<td><img src="{{.FiveHundredsGraphUrl}}" /></td>
+	<td><img src="{{.TimesGraphUrl}}" /></td>
+</tr>
+<tr>
+	<td></td>
+	<td><img src="{{.ReqsGraphUrlWeekly}}" /></td>
+	<td><img src="{{.FiveHundredsGraphUrlWeekly}}" /></td>
+	<td><img src="{{.TimesGraphUrlWeekly}}" /></td>
+</tr>
+{{ end }}
+</tbody>
+</table>
+
+</body>
+</html>
