@@ -11,13 +11,13 @@ import (
 )
 
 type Graph struct {
-	Base string
-	Attrs map[string]string
+	Base    string
+	Attrs   map[string]string
 	Targets []string
 }
 
 func NewGraph(base string) *Graph {
-	var g = &Graph{Base:base, Attrs:map[string]string{}, Targets:[]string{}}
+	var g = &Graph{Base: base, Attrs: map[string]string{}, Targets: []string{}}
 	return g
 }
 
@@ -35,27 +35,27 @@ func (g Graph) Render() template.URL {
 	pairs := make([]string, 0)
 	for _, t := range g.Targets {
 		pairs = append(pairs,
-			"target=" + template.URLQueryEscaper(t))
+			"target="+template.URLQueryEscaper(t))
 	}
-	for k,v := range g.Attrs {
+	for k, v := range g.Attrs {
 		pairs = append(pairs,
-			k + "=" + template.URLQueryEscaper(v))
+			k+"="+template.URLQueryEscaper(v))
 	}
 	return template.URL(g.Base + "render/?" + strings.Join(pairs, "&"))
 }
 
 type ApplicationInfo struct {
-	Name string
+	Name         string
 	GraphiteBase string
-	Width int
-	Height int
+	Width        int
+	Height       int
 }
 
 type ServerInfo struct {
-	Name string
+	Name         string
 	GraphiteBase string
-	Width int
-	Height int
+	Width        int
+	Height       int
 }
 
 func (s ServerInfo) GraphBase() *Graph {
@@ -112,7 +112,7 @@ func (s ServerInfo) DiskUsageGraphBase() *Graph {
 		"lineMode", "staircase").Param(
 		"areaMode", "first").Target(
 		"asPercent(server." + s.Name + ".disk.usage.available," +
-		"server." + s.Name + ".disk.usage.total)").Target(
+			"server." + s.Name + ".disk.usage.total)").Target(
 		"constantLine(10)")
 }
 
@@ -127,9 +127,9 @@ func (s ServerInfo) DiskUsageGraphUrlWeekly() template.URL {
 func (s ServerInfo) NetworkGraphBase() *Graph {
 	return s.GraphBase().Target(
 		"nonNegativeDerivative(server." +
-		s.Name + ".network.eth0.receive.byte_count)").Target(
+			s.Name + ".network.eth0.receive.byte_count)").Target(
 		"nonNegativeDerivative(server." +
-		s.Name + ".network.eth0.transmit.byte_count)")
+			s.Name + ".network.eth0.transmit.byte_count)")
 }
 
 func (s ServerInfo) NetworkGraphUrl() template.URL {
@@ -209,7 +209,6 @@ func (a ApplicationInfo) TimesGraphUrlWeekly() template.URL {
 	return a.TimesGraphBase().Weekly().Render()
 }
 
-
 func RabbitMQGraphBase(graphite_base string, width int, height int) *Graph {
 	return NewGraph(graphite_base).Param(
 		"_salt", "1369503684.499").Param(
@@ -275,13 +274,12 @@ func (g *Graph) NginxGraphUrlWeekly() template.URL {
 	return g.Weekly().Render()
 }
 
-
 type PageResponse struct {
-	Servers []ServerInfo
-	Applications []ApplicationInfo
+	Servers       []ServerInfo
+	Applications  []ApplicationInfo
 	RabbitMQGraph *Graph
-	RiakGraph *Graph
-	NginxGraph *Graph
+	RiakGraph     *Graph
+	NginxGraph    *Graph
 }
 
 func main() {
@@ -289,48 +287,48 @@ func main() {
 	flag.StringVar(&configFile, "config", "./dev.conf", "TOML config file")
 	flag.Parse()
 	var (
-		port      = config.String("port", "8888")
-		media_dir = config.String("media_dir", "static")
+		port          = config.String("port", "8888")
+		media_dir     = config.String("media_dir", "static")
 		graphite_base = config.String("graphite_base", "")
-		servers = config.String("servers", "")
-		apps = config.String("apps", "")
+		servers       = config.String("servers", "")
+		apps          = config.String("apps", "")
 	)
 	config.Parse(configFile)
 	http.HandleFunc("/",
 		func(w http.ResponseWriter, r *http.Request) {
-		var serverinfo = []ServerInfo{}
-		var appinfo = []ApplicationInfo{}
-		for _, s := range strings.Split(*servers, ",") {
-			serverinfo = append(serverinfo,
-				ServerInfo{
-				Name: s,
-				GraphiteBase: *graphite_base,
-				Width: 300,
-				Height: 100,
-			})
-		}
-		for _, a := range strings.Split(*apps, ",") {
-			appinfo = append(appinfo,
-				ApplicationInfo{
-				Name: a,
-				GraphiteBase: *graphite_base,
-				Width: 400,
-				Height: 100,
-			})
-		}
-		pr := PageResponse{
-			Servers: serverinfo,
-			Applications: appinfo,
-			RabbitMQGraph: RabbitMQGraphBase(*graphite_base, 1200, 100),
-			RiakGraph: RiakGraphBase(*graphite_base, 1200, 100),
-			NginxGraph: NginxGraphBase(*graphite_base, 1200, 100),
-		}
-		t, err := template.ParseFiles("index.html")
-		if err != nil {
-			fmt.Println(fmt.Sprintf("%v", err))
-		}
-		t.Execute(w, pr)
-	})
+			var serverinfo = []ServerInfo{}
+			var appinfo = []ApplicationInfo{}
+			for _, s := range strings.Split(*servers, ",") {
+				serverinfo = append(serverinfo,
+					ServerInfo{
+						Name:         s,
+						GraphiteBase: *graphite_base,
+						Width:        300,
+						Height:       100,
+					})
+			}
+			for _, a := range strings.Split(*apps, ",") {
+				appinfo = append(appinfo,
+					ApplicationInfo{
+						Name:         a,
+						GraphiteBase: *graphite_base,
+						Width:        400,
+						Height:       100,
+					})
+			}
+			pr := PageResponse{
+				Servers:       serverinfo,
+				Applications:  appinfo,
+				RabbitMQGraph: RabbitMQGraphBase(*graphite_base, 1200, 100),
+				RiakGraph:     RiakGraphBase(*graphite_base, 1200, 100),
+				NginxGraph:    NginxGraphBase(*graphite_base, 1200, 100),
+			}
+			t, err := template.ParseFiles("index.html")
+			if err != nil {
+				fmt.Println(fmt.Sprintf("%v", err))
+			}
+			t.Execute(w, pr)
+		})
 	http.Handle("/static/", http.StripPrefix("/static/",
 		http.FileServer(http.Dir(*media_dir))))
 	log.Fatal(http.ListenAndServe(":"+*port, nil))
