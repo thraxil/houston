@@ -209,26 +209,6 @@ func (a ApplicationInfo) TimesGraphUrlWeekly() template.URL {
 	return a.TimesGraphBase().Weekly().Render()
 }
 
-func RabbitMQGraphBase(graphite_base string, width int, height int) *Graph {
-	return NewGraph(graphite_base).Param(
-		"_salt", "1369503684.499").Param(
-		"width", fmt.Sprintf("%d", width)).Param(
-		"height", fmt.Sprintf("%d", height)).Param(
-		"bgcolor", "FFFFFF").Param(
-		"colorList", "#999999,#006699").Param(
-		"hideGrid", "true").Param(
-		"hideLegend", "true").Param(
-		"hideAxes", "true").Param(
-		"graphOnly", "true").Target(
-		"rabbitmq.*.celery").Param(
-		"lineMode", "connected").Param(
-		"drawNullAsZero", "True")
-}
-
-func (g *Graph) RabbitMQGraphUrl() template.URL {
-	return g.Render()
-}
-
 func RiakGraphBase(graphite_base string, width int, height int) *Graph {
 	return NewGraph(graphite_base).Param(
 		"_salt", "1369503684.499").Param(
@@ -277,7 +257,6 @@ func (g *Graph) NginxGraphUrlWeekly() template.URL {
 type PageResponse struct {
 	Servers       []ServerInfo
 	Applications  []ApplicationInfo
-	RabbitMQGraph *Graph
 	RiakGraph     *Graph
 	NginxGraph    *Graph
 }
@@ -319,7 +298,6 @@ func main() {
 			pr := PageResponse{
 				Servers:       serverinfo,
 				Applications:  appinfo,
-				RabbitMQGraph: RabbitMQGraphBase(*graphite_base, 1200, 100),
 				RiakGraph:     RiakGraphBase(*graphite_base, 1200, 100),
 				NginxGraph:    NginxGraphBase(*graphite_base, 1200, 100),
 			}
