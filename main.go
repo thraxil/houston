@@ -271,8 +271,10 @@ func main() {
 		graphite_base = config.String("graphite_base", "")
 		servers       = config.String("servers", "")
 		apps          = config.String("apps", "")
+		template_file = config.String("template", "index.html")
 	)
 	config.Parse(configFile)
+
 	http.HandleFunc("/",
 		func(w http.ResponseWriter, r *http.Request) {
 			var serverinfo = []ServerInfo{}
@@ -301,7 +303,7 @@ func main() {
 				RiakGraph:     RiakGraphBase(*graphite_base, 1200, 100),
 				NginxGraph:    NginxGraphBase(*graphite_base, 1200, 100),
 			}
-			t, err := template.ParseFiles("index.html")
+			t, err := template.ParseFiles(*template_file)
 			if err != nil {
 				fmt.Println(fmt.Sprintf("%v", err))
 			}
